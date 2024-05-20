@@ -24,11 +24,11 @@ namespace BitesByte_API.Service
                     gendervariable = -161;
 
                if (maintainanceCalories.weightMeasurer == "Kg")
-                    weight = maintainanceCalories.weight / (decimal)2.205;
+                    weight = maintainanceCalories.weight ;
                else if (maintainanceCalories.weightMeasurer == "Lbs")
-                    weight = maintainanceCalories.weight;
-               
-               BMR = (10 * weight) + ((decimal)6.25 * maintainanceCalories.height) - (5 * maintainanceCalories.age) + gendervariable;
+                    weight = maintainanceCalories.weight / (decimal)2.205;
+
+                BMR = (10 * weight) + ((decimal)6.25 * maintainanceCalories.height) - (5 * maintainanceCalories.age) + gendervariable;
 
                calories = BMR * getActivityLevel(maintainanceCalories.activityLevel);
             }
