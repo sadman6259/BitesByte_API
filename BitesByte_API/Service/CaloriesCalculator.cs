@@ -6,15 +6,15 @@ namespace BitesByte_API.Service
 {
     public interface ICaloriesCalculator
     {
-        decimal getMaintainaceCalories(MaintainanceCaloriesDTO maintainanceCalories);
+        int getMaintainaceCalories(MaintainanceCaloriesDTO maintainanceCalories);
     }
     public class CaloriesCalculator : ICaloriesCalculator
     {
-        public decimal getMaintainaceCalories(MaintainanceCaloriesDTO maintainanceCalories) {
-            decimal calories = 0;
+        public int getMaintainaceCalories(MaintainanceCaloriesDTO maintainanceCalories) {
+            int calories = 0;
 
             if (maintainanceCalories != null && IsValidInputforMaintainaceCalories(maintainanceCalories)) { 
-               decimal BMR = 0;
+               int BMR = 0;
                decimal weight = 0;
                int gendervariable = 0;
 
@@ -26,11 +26,11 @@ namespace BitesByte_API.Service
                if (maintainanceCalories.weightMeasurer == "Kg")
                     weight = maintainanceCalories.weight ;
                else if (maintainanceCalories.weightMeasurer == "Lbs")
-                    weight = maintainanceCalories.weight / (decimal)2.205;
+                    weight =  maintainanceCalories.weight / (decimal)2.205;
 
-                BMR = (10 * weight) + ((decimal)6.25 * maintainanceCalories.height) - (5 * maintainanceCalories.age) + gendervariable;
+                BMR = Convert.ToInt32( (10 * (double)weight) + (6.25 * maintainanceCalories.height) - (5 * maintainanceCalories.age) + gendervariable);
 
-               calories = BMR * getActivityLevel(maintainanceCalories.activityLevel);
+               calories = Convert.ToInt32( BMR * getActivityLevel(maintainanceCalories.activityLevel));
             }
             return calories;
         }
