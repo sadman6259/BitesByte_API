@@ -1,0 +1,35 @@
+﻿using BitesByte_API.Model;
+
+namespace BitesByte_API.Service
+{
+    public interface IMenuService
+    {
+        List<Menu> InsertandRetrieveMenues(List<Menu> menus);
+    }
+    public class MenuService : IMenuService
+    {
+        private readonly BitesByteDbContext bitesByteDbContext;
+        public MenuService(BitesByteDbContext _bitesByteDbContext) { 
+          this.bitesByteDbContext = _bitesByteDbContext;
+        }
+        public List<Menu> InsertandRetrieveMenues(List<Menu> menus)
+        {
+            try
+            {
+                List<Menu> menuList = new List<Menu>();
+
+                if (menus.Count > 0)
+                {
+                    bitesByteDbContext.Menu.AddRange(menus);
+                    bitesByteDbContext.SaveChanges();
+                }
+                menuList = bitesByteDbContext.Menu.ToList();
+                return menuList;
+            }
+            catch (Exception ex) {
+                throw;
+            }
+           
+        }
+    }
+}
