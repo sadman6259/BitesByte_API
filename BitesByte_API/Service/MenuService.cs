@@ -20,10 +20,10 @@ namespace BitesByte_API.Service
 
                 if (menus.Count > 0)
                 {
-                    bitesByteDbContext.Menu.AddRange(menus);
+                    bitesByteDbContext.Menus.AddRange(menus);
                     bitesByteDbContext.SaveChanges();
                 }
-                menuList = bitesByteDbContext.Menu.ToList();
+                menuList = bitesByteDbContext.Menus.ToList();
                 return menuList;
             }
             catch (Exception ex) {

@@ -19,6 +19,7 @@ internal class Program
         
         builder.Services.AddScoped<ICaloriesCalculator, CaloriesCalculator>();
         builder.Services.AddScoped<IMenuService, MenuService>();
+        builder.Services.AddScoped<IUserService, UserService>();
 
         builder.Services.AddCors(options =>
         {
@@ -63,6 +64,24 @@ internal class Program
             return menuService.InsertandRetrieveMenues(menuLst);
         })
         .WithName("InsertMenues")
+        .WithOpenApi();
+        #endregion
+
+        #region registeruser
+        app.MapPost("/registerUser", (IUserService userService, [FromBody] UserDTO user) =>
+        {
+            return userService.RegisterUser(user);
+        })
+        .WithName("RegisterUser")
+        .WithOpenApi();
+        #endregion
+
+        #region loginuser
+        app.MapPost("/loginUser", (IUserService userService, [FromBody] LoginUserDTO user) =>
+        {
+            return userService.LoginUser(user);
+        })
+        .WithName("LoginUser")
         .WithOpenApi();
         #endregion
 
