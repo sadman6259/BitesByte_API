@@ -5,6 +5,7 @@ namespace BitesByte_API.Service
     public interface IMenuService
     {
         List<Menu> InsertandRetrieveMenues(List<Menu> menus);
+        List<Menu> GetAvailableMenu();
     }
     public class MenuService : IMenuService
     {
@@ -30,6 +31,16 @@ namespace BitesByte_API.Service
                 throw;
             }
            
+        }
+
+        public List<Menu> GetAvailableMenu()
+        {
+            try
+            {
+                return bitesByteDbContext.Menus.ToList();
+
+            }
+            catch (Exception) { throw;  }
         }
     }
 }

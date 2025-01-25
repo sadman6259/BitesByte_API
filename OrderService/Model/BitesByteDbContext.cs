@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
-namespace BitesByte_API.Model;
+namespace OrderService.Model;
 
 public partial class BitesByteDbContext : DbContext
 {
@@ -17,7 +17,9 @@ public partial class BitesByteDbContext : DbContext
 
     public virtual DbSet<Menu> Menus { get; set; }
 
-    
+    public virtual DbSet<Order> Orders { get; set; }
+
+    public virtual DbSet<OrderDetail> OrderDetails { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
 
@@ -47,7 +49,28 @@ public partial class BitesByteDbContext : DbContext
             entity.Property(e => e.TotalCalories).HasColumnType("decimal(18, 4)");
         });
 
-      
+        modelBuilder.Entity<Order>(entity =>
+        {
+            entity.ToTable("Order");
+
+            entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+            entity.Property(e => e.OrderReferenceNo)
+                .HasMaxLength(20)
+                .IsUnicode(false);
+            entity.Property(e => e.TotalPrice).HasColumnType("decimal(10, 2)");
+            entity.Property(e => e.UserId).HasColumnName("UserID");
+        });
+
+        modelBuilder.Entity<OrderDetail>(entity =>
+        {
+            entity.Property(e => e.CreatedTime).HasColumnType("datetime");
+            entity.Property(e => e.MenuId).HasColumnName("MenuID");
+            entity.Property(e => e.OrderReferenceNo)
+                .HasMaxLength(20)
+                .IsUnicode(false);
+            entity.Property(e => e.TotalPrice).HasColumnType("decimal(10, 2)");
+        });
+
         modelBuilder.Entity<User>(entity =>
         {
             entity.ToTable("User");

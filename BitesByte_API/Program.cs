@@ -20,6 +20,8 @@ internal class Program
         builder.Services.AddScoped<ICaloriesCalculator, CaloriesCalculator>();
         builder.Services.AddScoped<IMenuService, MenuService>();
         builder.Services.AddScoped<IUserService, UserService>();
+        
+
 
         builder.Services.AddCors(options =>
         {
@@ -85,6 +87,16 @@ internal class Program
         .WithOpenApi();
         #endregion
 
+        #region getavailablemenus
+        app.MapGet("/getavailablemenus", (IMenuService menuService) =>
+        {
+            return menuService.GetAvailableMenu();
+        })
+        .WithName("GetAvailableMenus")
+        .WithOpenApi();
+        #endregion
+
+        
         app.Run();
     }
 }
