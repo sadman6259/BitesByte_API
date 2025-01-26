@@ -20,6 +20,17 @@ namespace OrderService.Helper
             #endregion
         }
 
+        public static void getOrderByRefno(WebApplication app)
+        {
+            #region getOrderByRefno
+            app.MapPost("/getorderbyrefno", (IOrderService orderService, [FromBody] string OrderRef) =>
+            {
+                return orderService.GetOrderByRefNo(OrderRef);
+            })
+            .WithName("getOrderByRefno")
+            .WithOpenApi();
+            #endregion
+        }
 
     }
 }

@@ -11,6 +11,8 @@ namespace OrderService.Service
 
         Task<string> GenerateOrderRef();
 
+        Task<OrderWithDetailDTO> GetOrderByRefNo(string orderRef);
+
 
     }
     public class OrderService : IOrderService
@@ -64,6 +66,10 @@ namespace OrderService.Service
             
             return orderRef;
         }
-       
+
+        public async Task<OrderWithDetailDTO> GetOrderByRefNo(string orderRef)
+        {
+            return orderRepository.GetOrderByRefNo(orderRef);
+        }
     }
 }

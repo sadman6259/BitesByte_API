@@ -30,6 +30,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 APIHelper.placeOrder(app);
+APIHelper.getOrderByRefno(app);
 
 app.Run();
 
