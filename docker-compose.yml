@@ -1,13 +1,46 @@
-﻿﻿services:
-  webapi:
+version: '3.8'
+
+services:
+  bitesbyte_api:
+    image: bitesbyte_api-api
     build:
       context: .
       dockerfile: Dockerfile
-    image: bitesbyteapp:V2
-    container_name: webapi
     ports:
-      - "7000:8080"
+      - "5001:8080"
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Server=host.docker.internal,1400;Database=BitesByteDB;User Id=sa;Password=Str0ngPamicrosoft/mssql-server-linux:2017-latestw0rd;Trusted_Connection=False;TrustServerCertificate=true
- 
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Server=host.docker.internal,1433;Database=BitesByteDB;User Id=sha;Password=YourStrong!Passw0rd;Trusted_Connection=false;Persist Security Info=False;Encrypt=False; 
+    depends_on:
+      - db  # Waits for DB to be ready
+    command: ["dotnet", "/app/BitesByte_API/BitesByte_API.dll"]
+
+  orderservice:
+    image: orderservice-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5002:8080"
+    environment:
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Server=host.docker.internal,1433;Database=BitesByteDB;User Id=sha;Password=YourStrong!Passw0rd;Trusted_Connection=false;Persist Security Info=False;Encrypt=False;
+    depends_on:
+      - db  # Waits for DB to be ready
+    command: ["dotnet", "/app/OrderService/OrderService.dll"]
+ # MS SQL Server Database
+  db:
+    image: "mcr.microsoft.com/mssql/server:2022-latest"
+    container_name: sql_server
+    restart: always
+    ports:
+      - "1433:1433"
+    environment:
+      SA_PASSWORD: "YourStrong!Passw0rd"
+      ACCEPT_EULA: "Y"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+
+volumes:
+  sqlserver_data:
+    driver: local

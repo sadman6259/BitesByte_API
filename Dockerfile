@@ -1,27 +1,35 @@
-#See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
-
-#Depending on the operating system of the host machines(s) that will build or run the containers, the image specified in the FROM statement may need to be changed.
-#For more information, please see https://aka.ms/containercompat
-
-FROM mcr.microsoft.com/dotnet/aspnet:8.0-nanoserver-1809 AS base
+# Use official .NET SDK image for building
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /app
+
+# Copy solution and restore dependencies
+COPY *.sln ./
+COPY BitesByte_API/BitesByte_API.csproj BitesByte_API/
+COPY OrderService/OrderService.csproj OrderService/
+RUN dotnet restore
+
+# Copy entire project files
+COPY . ./
+
+# Publish BitesByte_API
+RUN dotnet publish BitesByte_API/BitesByte_API.csproj -c Release -o /app/out_BitesByte_API
+
+# Publish OrderService
+RUN dotnet publish OrderService/OrderService.csproj -c Release -o /app/out_OrderService
+
+# Use runtime-only image for final deployment
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+WORKDIR /app
+
+# Copy built files from builder stage
+COPY --from=build /app/out_BitesByte_API /app/BitesByte_API
+COPY --from=build /app/out_OrderService /app/OrderService
+
+# Expose ports for both APIs
 EXPOSE 8080
-EXPOSE 8081
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0-nanoserver-1809 AS build
-ARG BUILD_CONFIGURATION=Release
-WORKDIR /src
-COPY ["BitesByte_API/BitesByte_API.csproj", "BitesByte_API/"]
-RUN dotnet restore "./BitesByte_API/BitesByte_API.csproj"
-COPY . .
-WORKDIR "/src/BitesByte_API"
-RUN dotnet build "./BitesByte_API.csproj" -c %BUILD_CONFIGURATION% -o /app/build
+# Start both APIs using a script
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+CMD ["/app/entrypoint.sh"]
 
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./BitesByte_API.csproj" -c %BUILD_CONFIGURATION% -o /app/publish /p:UseAppHost=false
-
-FROM base AS final
-WORKDIR /app
-COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "BitesByte_API.dll"]
