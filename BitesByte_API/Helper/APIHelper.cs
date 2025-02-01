@@ -1,0 +1,73 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using BitesByte_API.Model;
+using BitesByte_API.Service;
+using System.Runtime.CompilerServices;
+
+namespace BitesByte_API.Helper
+{
+    public static class APIHelper
+    {
+       
+        public static void getMaintainaceCalories(WebApplication app)
+        {
+            #region getMaintainaceCalories
+            app.MapPost("/getMaintainaceCalories", (ICaloriesCalculator caloriesCalculator, [FromBody] MaintainanceCaloriesDTO maintainanceCaloriesDTO) =>
+            {
+                return caloriesCalculator.getMaintainaceCalories(maintainanceCaloriesDTO);
+            })
+            .WithName("GetMaintainaceCalories")
+            .WithOpenApi();
+            #endregion
+        }
+
+        public static void insertmenu(WebApplication app)
+        {
+            #region insertmenu
+            app.MapPost("/insertMenues", (IMenuService menuService, [FromBody] List<Menu> menuLst) =>
+            {
+                return menuService.InsertandRetrieveMenues(menuLst);
+            })
+            .WithName("InsertMenues")
+            .WithOpenApi();
+            #endregion
+        }
+
+        public static void registerUser(WebApplication app)
+        {
+            #region registeruser
+            app.MapPost("/registerUser", (IUserService userService, [FromBody] UserDTO user) =>
+            {
+                return userService.RegisterUser(user);
+            })
+            .WithName("RegisterUser")
+            .WithOpenApi();
+            #endregion
+
+        }
+        public static void loginUser(WebApplication app)
+        {
+            #region loginuser
+            app.MapPost("/loginUser", (IUserService userService, [FromBody] LoginUserDTO user) =>
+            {
+                return userService.LoginUser(user);
+            })
+            .WithName("LoginUser")
+            .WithOpenApi();
+            #endregion
+
+        }
+
+        public static void getavailablemenus(WebApplication app)
+        {
+            #region getavailablemenus
+            app.MapGet("/getavailablemenus", (IMenuService menuService) =>
+            {
+                return menuService.GetAvailableMenu();
+            })
+            .WithName("GetAvailableMenus")
+            .WithOpenApi();
+            #endregion
+
+        }
+    }
+}

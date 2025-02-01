@@ -2,6 +2,7 @@ using BitesByte_API.Service;
 using BitesByte_API.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using OrderService.Helper;
 
 internal class Program
 {
@@ -51,52 +52,12 @@ internal class Program
 
         app.UseHttpsRedirection();
 
-        #region getMaintainaceCalories
-        app.MapPost("/getMaintainaceCalories", (ICaloriesCalculator caloriesCalculator, [FromBody] MaintainanceCaloriesDTO maintainanceCaloriesDTO) =>
-        {
-            return caloriesCalculator.getMaintainaceCalories(maintainanceCaloriesDTO);
-        })
-        .WithName("GetMaintainaceCalories")
-        .WithOpenApi();
-        #endregion
+        BitesByte_API.Helper.APIHelper.registerUser(app);
+        BitesByte_API.Helper.APIHelper.loginUser(app);
+        BitesByte_API.Helper.APIHelper.insertmenu(app);
+        BitesByte_API.Helper.APIHelper.getavailablemenus(app);
+        BitesByte_API.Helper.APIHelper.getMaintainaceCalories(app);
 
-        #region insertmenu
-        app.MapPost("/insertMenues", (IMenuService menuService, [FromBody] List<Menu> menuLst) =>
-        {
-            return menuService.InsertandRetrieveMenues(menuLst);
-        })
-        .WithName("InsertMenues")
-        .WithOpenApi();
-        #endregion
-
-        #region registeruser
-        app.MapPost("/registerUser", (IUserService userService, [FromBody] UserDTO user) =>
-        {
-            return userService.RegisterUser(user);
-        })
-        .WithName("RegisterUser")
-        .WithOpenApi();
-        #endregion
-
-        #region loginuser
-        app.MapPost("/loginUser", (IUserService userService, [FromBody] LoginUserDTO user) =>
-        {
-            return userService.LoginUser(user);
-        })
-        .WithName("LoginUser")
-        .WithOpenApi();
-        #endregion
-
-        #region getavailablemenus
-        app.MapGet("/getavailablemenus", (IMenuService menuService) =>
-        {
-            return menuService.GetAvailableMenu();
-        })
-        .WithName("GetAvailableMenus")
-        .WithOpenApi();
-        #endregion
-
-        
         app.Run();
     }
 }
