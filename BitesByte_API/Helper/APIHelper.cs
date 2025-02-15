@@ -69,5 +69,18 @@ namespace BitesByte_API.Helper
             #endregion
 
         }
+
+        public static void GetRecommendedMenuByCalorie(WebApplication app)
+        {
+            #region getavailablemenus
+            app.MapPost("/getRecommendedMenuByCalorie", (IMenuService menuService, [FromBody] int cal) =>
+            {
+                return menuService.GetRecommendedMenuByCalorie(cal);
+            })
+            .WithName("GetRecommendedMenuByCalorie")
+            .WithOpenApi();
+            #endregion
+
+        }
     }
 }
