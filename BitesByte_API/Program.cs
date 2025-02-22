@@ -58,7 +58,7 @@ internal class Program
         BitesByte_API.Helper.APIHelper.getavailablemenus(app);
         BitesByte_API.Helper.APIHelper.getMaintainaceCalories(app);
         BitesByte_API.Helper.APIHelper.GetRecommendedMenuByCalorie(app);
-
+        BitesByte_API.Helper.APIHelper.GetRecommendedMenuByProteinCarbs(app);
         app.Run();
     }
 }
