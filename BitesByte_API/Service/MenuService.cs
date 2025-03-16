@@ -7,7 +7,7 @@ namespace BitesByte_API.Service
     {
         List<Menu> InsertandRetrieveMenues(List<Menu> menus);
         List<Menu> GetAvailableMenu();
-
+        List<Menu> GetMenusBySubCategory(string subcat,string category);
         List<Menu> GetRecommendedMenuByCalorie(decimal? cal);
         List<Menu> GetRecommendedMenuByProteinCarbs(decimal? protein,decimal? carbs);
     }
@@ -15,12 +15,12 @@ namespace BitesByte_API.Service
     {
         private readonly BitesByteDbContext bitesByteDbContext;
 
-        private readonly int ConstAdvforStandard = 50;
+        private readonly int ConstAdvforStandard = 30;
 
-        //private readonly int ConstAdvforMacro = 80;
+        //private readonly int ConstAdvforMacro = 10;
 
-        private readonly int ConstAdvforMacro1stprio = 5;
-        private readonly decimal ConstAdvforMacro2ndprio = 2.5M;
+        private readonly decimal ConstAdvforMacro1stprio = 0.5M;
+        private readonly decimal ConstAdvforMacro2ndprio = 0.25M;
         public MenuService(BitesByteDbContext _bitesByteDbContext) { 
           this.bitesByteDbContext = _bitesByteDbContext;
         }
@@ -42,6 +42,17 @@ namespace BitesByte_API.Service
                 throw;
             }
            
+        }
+
+        public List<Menu> GetMenusBySubCategory(string subcat, string category)
+        {
+            try
+            {
+                List<Menu> menus = new List<Menu>();
+                menus = bitesByteDbContext.Menus.Where(x => x.Subcategories.Contains(subcat) && category == category).ToList();
+                return menus;
+            }
+            catch (Exception) { throw; }
         }
 
         public List<Menu> GetAvailableMenu()
@@ -86,6 +97,7 @@ namespace BitesByte_API.Service
 
                         var menuself = recommendedstandardmenu.Where(x => x.MenuName == menu.MenuName).ToList();
 
+                        // if the current menu is not aldy added as a recommended menu
                         if (recommendedstandardmenu.Count > 0 && menuself.Count == 0)
                         {
                             for (int i= 0;i < recommendedstandardmenu.Count;i++)
@@ -183,8 +195,8 @@ namespace BitesByte_API.Service
             List<Menu> allmenues = bitesByteDbContext.Menus.ToList();
             List<Menu> macroMenues = allmenues.Where(x => !string.IsNullOrEmpty(x.Category) && x.Category.ToLower() == "macro").ToList();
 
-            List<Menu> proteinMacroMenues = macroMenues.Where(x => x.Protein != null && x.Protein > 0 && x.Protein < protein).OrderBy(x => x.Protein).ToList();
-            List<Menu> carbsMacroMenues = macroMenues.Where(x => x.Carbs != null && x.Carbs > 0 && x.Carbs < carbs).OrderBy(x => x.Carbs).ToList();
+            List<Menu> proteinMacroMenues = macroMenues.Where(x => x.Protein != null && x.Protein > 0 && x.Protein < protein && x.Subcategories == "protein").OrderBy(x => x.Protein).ToList();
+            List<Menu> carbsMacroMenues = macroMenues.Where(x => x.Carbs != null && x.Carbs > 0 && x.Carbs < carbs && x.Subcategories == "carbs").OrderBy(x => x.Carbs).ToList();
 
             List<Menu> recommendedProteinMenues = new List<Menu>();
             List<Menu> recommendedCarbsMenues = new List<Menu>();
@@ -269,7 +281,7 @@ namespace BitesByte_API.Service
                         {
                             // removed last item protein
                             runningProtein -= recommendedProteinMenues[i].Protein;
-                            runningProtein += menu.Protein;
+                            //runningProtein += menu.Protein;
 
                             if (runningProtein <= protein)
                             {
@@ -311,7 +323,7 @@ namespace BitesByte_API.Service
                         {
                             // removed last item protein
                             runningCarbs -= recommendedCarbsMenues[i].Carbs;
-                            runningCarbs += menu.Carbs;
+                            //runningCarbs += menu.Carbs;
 
                             if (runningCarbs <= carbs)
                             {

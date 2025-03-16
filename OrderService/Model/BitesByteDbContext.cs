@@ -69,6 +69,8 @@ public partial class BitesByteDbContext : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.TotalPrice).HasColumnType("decimal(10, 2)");
+            entity.Property(e => e.TotalGrams).HasColumnType("decimal(18, 4)");
+
         });
 
         modelBuilder.Entity<User>(entity =>

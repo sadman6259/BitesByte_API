@@ -24,4 +24,9 @@ public partial class Menu
     public string? Plan { get; set; }
 
     public byte[]? Image { get; set; }
+
+    public decimal? PricePerGram { get; set; }
+    public string? Subcategories { get; set; }
+    public int? WeekNumber { get; set; }
+
 }

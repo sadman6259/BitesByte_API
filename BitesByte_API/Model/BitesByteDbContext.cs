@@ -45,6 +45,11 @@ public partial class BitesByteDbContext : DbContext
             entity.Property(e => e.Price).HasColumnType("decimal(18, 4)");
             entity.Property(e => e.Protein).HasColumnType("decimal(18, 4)");
             entity.Property(e => e.TotalCalories).HasColumnType("decimal(18, 4)");
+            entity.Property(e => e.PricePerGram).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.Subcategories)
+                .HasMaxLength(5000)
+                .IsUnicode(true);
+
         });
 
       

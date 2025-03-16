@@ -16,4 +16,6 @@ public partial class OrderDetail
     public decimal? TotalPrice { get; set; }
 
     public DateTime? CreatedTime { get; set; }
+    public decimal? TotalGrams { get; set; }
+
 }

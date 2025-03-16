@@ -47,13 +47,14 @@ namespace OrderService.Service
 
             foreach (var orderDetailDto in orderDetailDtoLst)
             {
-                OrderDetail newOrderDetail = new OrderDetail();
-                newOrderDetail.TotalPrice = orderDetailDto.TotalPrice;
-                newOrderDetail.Quantity = orderDetailDto.Quantity;
-                newOrderDetail.MenuId = orderDetailDto.menuId;
-                newOrderDetail.CreatedTime = DateTime.Now;
-                newOrderDetail.OrderReferenceNo = orderRef;
-                newOrderDetailLst.Add(newOrderDetail);
+                OrderDetail newDetail = new OrderDetail();
+                newDetail.TotalPrice = orderDetailDto.TotalPrice;
+                newDetail.Quantity = orderDetailDto.Quantity;
+                newDetail.MenuId = orderDetailDto.menuId;
+                newDetail.CreatedTime = DateTime.Now;
+                newDetail.OrderReferenceNo = orderRef;
+                newDetail.TotalGrams = orderDetailDto.TotalGrams;
+                newOrderDetailLst.Add(newDetail);
 
             }
             

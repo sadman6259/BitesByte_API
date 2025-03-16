@@ -86,11 +86,24 @@ namespace BitesByte_API.Helper
         public static void GetRecommendedMenuByProteinCarbs(WebApplication app)
         {
             #region getavailablemenus
-            app.MapPost("/getRecommendedMenuByProteinCarbs", (IMenuService menuService, [FromBody] decimal? protein, decimal? carbs) =>
+            app.MapGet("/getRecommendedMenuByProteinCarbs", (IMenuService menuService, decimal? protein, decimal? carbs) =>
             {
                 return menuService.GetRecommendedMenuByProteinCarbs(protein,carbs);
             })
             .WithName("GetRecommendedMenuByProteinCarbs")
+            .WithOpenApi();
+            #endregion
+
+        }
+
+        public static void GetMenusBySubCategory(WebApplication app)
+        {
+            #region getmenusbysubcategory
+            app.MapGet("/getMenusBySubCategory", (IMenuService menuService, string? subcategory, string? category) =>
+            {
+                return menuService.GetMenusBySubCategory(subcategory,category);
+            })
+            .WithName("GetMenusBySubCategory")
             .WithOpenApi();
             #endregion
 
