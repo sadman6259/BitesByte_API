@@ -108,5 +108,17 @@ namespace BitesByte_API.Helper
             #endregion
 
         }
+        public static void UpdateMenus(WebApplication app)
+        {
+            #region getmenusbysubcategory
+            app.MapPost("/updateMenus", (IMenuService menuService, [FromBody] List<Menu> menuLst) =>
+            {
+                menuService.UpdateMenues(menuLst);
+            })
+            .WithName("UpdateMenus")
+            .WithOpenApi();
+            #endregion
+
+        }
     }
 }

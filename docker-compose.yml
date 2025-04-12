@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   bitesbyte_api:
     image: bitesbyte_api-api

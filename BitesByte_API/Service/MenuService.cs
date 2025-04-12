@@ -6,10 +6,12 @@ namespace BitesByte_API.Service
     public interface IMenuService
     {
         List<Menu> InsertandRetrieveMenues(List<Menu> menus);
+        public void UpdateMenues(List<Menu> menus);
         List<Menu> GetAvailableMenu();
         List<Menu> GetMenusBySubCategory(string subcat,string category);
         List<Menu> GetRecommendedMenuByCalorie(decimal? cal);
         List<Menu> GetRecommendedMenuByProteinCarbs(decimal? protein,decimal? carbs);
+
     }
     public class MenuService : IMenuService
     {
@@ -23,6 +25,18 @@ namespace BitesByte_API.Service
         private readonly decimal ConstAdvforMacro2ndprio = 0.25M;
         public MenuService(BitesByteDbContext _bitesByteDbContext) { 
           this.bitesByteDbContext = _bitesByteDbContext;
+        }
+        public void UpdateMenues(List<Menu> menus)
+        {
+            try {
+                foreach (var menu in menus) { 
+                   Menu menuDB = bitesByteDbContext.Menus.FirstOrDefault(x => x.MenuName == menu.MenuName);
+  
+                    menuDB.Image = menu.Image;
+                }
+                bitesByteDbContext.SaveChanges();
+            }
+            catch (Exception) { throw; }
         }
         public List<Menu> InsertandRetrieveMenues(List<Menu> menus)
         {
@@ -195,8 +209,8 @@ namespace BitesByte_API.Service
             List<Menu> allmenues = bitesByteDbContext.Menus.ToList();
             List<Menu> macroMenues = allmenues.Where(x => !string.IsNullOrEmpty(x.Category) && x.Category.ToLower() == "macro").ToList();
 
-            List<Menu> proteinMacroMenues = macroMenues.Where(x => x.Protein != null && x.Protein > 0 && x.Protein < protein && x.Subcategories == "protein").OrderBy(x => x.Protein).ToList();
-            List<Menu> carbsMacroMenues = macroMenues.Where(x => x.Carbs != null && x.Carbs > 0 && x.Carbs < carbs && x.Subcategories == "carbs").OrderBy(x => x.Carbs).ToList();
+            List<Menu> proteinMacroMenues = macroMenues.Where(x => x.Protein != null && x.Protein > 0 && x.Protein < protein && x.Subcategories.ToLower() == "protein").OrderBy(x => x.Protein).ToList();
+            List<Menu> carbsMacroMenues = macroMenues.Where(x => x.Carbs != null && x.Carbs > 0 && x.Carbs < carbs && x.Subcategories.ToLower() == "carbs").OrderBy(x => x.Carbs).ToList();
 
             List<Menu> recommendedProteinMenues = new List<Menu>();
             List<Menu> recommendedCarbsMenues = new List<Menu>();
