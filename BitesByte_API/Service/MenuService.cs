@@ -11,7 +11,8 @@ namespace BitesByte_API.Service
         List<Menu> GetMenusBySubCategory(string subcat,string category);
         List<Menu> GetRecommendedMenuByCalorie(decimal? cal);
         List<Menu> GetRecommendedMenuByProteinCarbs(decimal? protein,decimal? carbs);
-
+        List<Menu> GetRecommendedMenuByCarbs(decimal? carbs);
+        List<Menu> GetRecommendedMenuByProtein(decimal? protein);
     }
     public class MenuService : IMenuService
     {
@@ -19,7 +20,7 @@ namespace BitesByte_API.Service
 
         private readonly int ConstAdvforStandard = 30;
 
-        //private readonly int ConstAdvforMacro = 10;
+        private readonly int ConstAdvforMacro = 70;
 
         private readonly decimal ConstAdvforMacro1stprio = 0.5M;
         private readonly decimal ConstAdvforMacro2ndprio = 0.25M;
@@ -116,7 +117,7 @@ namespace BitesByte_API.Service
                         {
                             for (int i= 0;i < recommendedstandardmenu.Count;i++)
                             {
-                                if (tempCal - recommendedstandardmenu[i].TotalCalories  <= cal  /*tempCal - recommendedstandardmenu[i].TotalCalories <= cal*/)
+                                if (tempCal - recommendedstandardmenu[i].TotalCalories  <= cal + ConstAdvforStandard /*tempCal - recommendedstandardmenu[i].TotalCalories <= cal*/)
                                 {
                                     tempCal -= recommendedstandardmenu[i].TotalCalories;
                                     runningCal -= recommendedstandardmenu[i].TotalCalories;
@@ -151,58 +152,182 @@ namespace BitesByte_API.Service
                     recommendedMenues.Add(defaultmenu);
                     tempCal += defaultmenu.TotalCalories;
                     runningCal += defaultmenu.TotalCalories;
-
-
                 }
 
+                // just take 70 as a threshold for a single menu and show micro menues
 
-                // 1. forloop macroMenues
-                ;
-                foreach (var macromenu in macroMenues)
-                {
-                    tempCal += macromenu.TotalCalories;
-                    if (tempCal <= cal)
-                    {
-                        recommendedMenues.Add(macromenu);
-                    }
-                    else
-                    {
-                        var recommendedmacromenu = recommendedMenues.Where(x => x.Category.ToLower() == "macro").ToList();
-
-                        if (recommendedmacromenu.Count > 0)
-                        {
-
-                            for (int i = 0; i < recommendedmacromenu.Count; i++)
-                            {
-                                if (tempCal - recommendedmacromenu[i].TotalCalories <= cal)
-                                {
-                                    tempCal -= recommendedmacromenu[i].TotalCalories;
-                                    recommendedMenues.Remove(recommendedmacromenu[i]);
-
-
-                                    recommendedMenues.Add(macromenu);
-                                }
-                            }
-
-                        }
-                        else
-                        {
-                            if (tempCal <= cal )
-                            {
-                                recommendedMenues.Add(macromenu);
-                            }
-                        }
-
-                    }
-                }
-
-                
+                recommendedMenues.AddRange(GetMacromenuesByCal(cal - tempCal, macroMenues));
 
                 return recommendedMenues;
 
             }
             catch (Exception) { throw; }
         }
+
+        private List<Menu> GetMacromenuesByCal(decimal? cal, List<Menu> macroMenues)
+        {
+            List<Menu> recommendedMenues = new List<Menu>();
+
+            if (cal >= 30)
+            {
+                if (cal <= 70)
+                {
+                    // 1 menu
+                    Random rnd = new Random();
+                    Menu randmenu = macroMenues.OrderBy(x => rnd.Next()).First();
+                    recommendedMenues.Add(randmenu);
+                }
+                else if (cal > 70 && cal <= 140)
+                {
+                    // 2 menus
+                    Random rnd = new Random();
+                    Menu randmenu = macroMenues.OrderBy(x => rnd.Next()).First();
+                    recommendedMenues.Add(randmenu);
+
+                    Random rnd2 = new Random();
+                    // preventing duplicates
+                    Menu randmenu2 = macroMenues.Where(x => x.MenuName != randmenu.MenuName).OrderBy(x => rnd2.Next()).First();
+                    recommendedMenues.Add(randmenu2);
+                }
+                else if (cal > 140)
+                {
+                    // 3 menus
+                    Random rnd = new Random();
+                    Menu randmenu = macroMenues.OrderBy(x => rnd.Next()).First();
+                    recommendedMenues.Add(randmenu);
+
+                    Random rnd2 = new Random();
+                    // preventing duplicates
+                    Menu randmenu2 = macroMenues.Where(x => x.MenuName != randmenu.MenuName).OrderBy(x => rnd2.Next()).First();
+                    recommendedMenues.Add(randmenu2);
+
+                    Random rnd3 = new Random();
+                    // preventing duplicates
+                    Menu randmenu3 = macroMenues.Where(x => x.MenuName != randmenu.MenuName && x.MenuName != randmenu2.MenuName).OrderBy(x => rnd3.Next()).First();
+                    recommendedMenues.Add(randmenu3);
+                }
+            }
+
+
+            return recommendedMenues;
+        }
+
+        private List<Menu> GetMacromenuesByProtein(decimal? proteinGrams, List<Menu> macroMenues)
+        {
+            List<Menu> recommendedMenues = new List<Menu>();
+
+            if (proteinGrams >= 20)
+            {
+                if (proteinGrams <= 100)
+                {
+                    // 2 menus
+                    Random rnd = new Random();
+                    Menu randmenu = macroMenues.OrderBy(x => rnd.Next()).First();
+                    recommendedMenues.Add(randmenu);
+
+                    Random rnd2 = new Random();
+                    // preventing duplicates
+                    Menu randmenu2 = macroMenues.Where(x => x.MenuName != randmenu.MenuName).OrderBy(x => rnd2.Next()).First();
+                    recommendedMenues.Add(randmenu2);
+                }
+                else if (proteinGrams > 100)
+                {
+                    // 3 menus
+                    Random rnd = new Random();
+                    Menu randmenu = macroMenues.OrderBy(x => rnd.Next()).First();
+                    recommendedMenues.Add(randmenu);
+
+                    Random rnd2 = new Random();
+                    // preventing duplicates
+                    Menu randmenu2 = macroMenues.Where(x => x.MenuName != randmenu.MenuName).OrderBy(x => rnd2.Next()).First();
+                    recommendedMenues.Add(randmenu2);
+
+                    Random rnd3 = new Random();
+                    // preventing duplicates
+                    Menu randmenu3 = macroMenues.Where(x => x.MenuName != randmenu.MenuName && x.MenuName != randmenu2.MenuName).OrderBy(x => rnd3.Next()).First();
+                    recommendedMenues.Add(randmenu3);
+                }
+            }
+            else
+            {
+                // 1 menu
+                Random rnd = new Random();
+                Menu randmenu = macroMenues.OrderBy(x => rnd.Next()).First();
+                recommendedMenues.Add(randmenu);
+            }
+
+
+            return recommendedMenues;
+        }
+
+        private List<Menu> GetMacromenuesByCarbs(decimal? carbsGrams, List<Menu> macroMenues)
+        {
+            List<Menu> recommendedMenues = new List<Menu>();
+
+            if (carbsGrams >= 20)
+            {
+                if (carbsGrams <= 100)
+                {
+                    // 2 menus
+                    Random rnd = new Random();
+                    Menu randmenu = macroMenues.OrderBy(x => rnd.Next()).First();
+                    recommendedMenues.Add(randmenu);
+
+                    Random rnd2 = new Random();
+                    // preventing duplicates
+                    Menu randmenu2 = macroMenues.Where(x => x.MenuName != randmenu.MenuName).OrderBy(x => rnd2.Next()).First();
+                    recommendedMenues.Add(randmenu2);
+                }
+                else if (carbsGrams > 100)
+                {
+                    // 3 menus
+                    Random rnd = new Random();
+                    Menu randmenu = macroMenues.OrderBy(x => rnd.Next()).First();
+                    recommendedMenues.Add(randmenu);
+
+                    Random rnd2 = new Random();
+                    // preventing duplicates
+                    Menu randmenu2 = macroMenues.Where(x => x.MenuName != randmenu.MenuName).OrderBy(x => rnd2.Next()).First();
+                    recommendedMenues.Add(randmenu2);
+
+                    Random rnd3 = new Random();
+                    // preventing duplicates
+                    Menu randmenu3 = macroMenues.Where(x => x.MenuName != randmenu.MenuName && x.MenuName != randmenu2.MenuName).OrderBy(x => rnd3.Next()).First();
+                    recommendedMenues.Add(randmenu3);
+                }
+            }
+            else
+            {
+                // 1 menu
+                Random rnd = new Random();
+                Menu randmenu = macroMenues.OrderBy(x => rnd.Next()).First();
+                recommendedMenues.Add(randmenu);
+            }
+
+
+            return recommendedMenues;
+        }
+
+        public List<Menu> GetRecommendedMenuByProtein(decimal? protein)
+        {
+            try
+            {
+                List<Menu> proteinMacroMenues = bitesByteDbContext.Menus.Where(x => x.Protein != null && x.Protein > 0 && x.Subcategories.ToLower() == "protein").ToList();
+                return GetMacromenuesByProtein(protein, proteinMacroMenues);
+            }
+            catch(Exception) { throw; }
+        }
+
+        public List<Menu> GetRecommendedMenuByCarbs(decimal? carbs)
+        {
+            try
+            {
+                List<Menu> carbsMacroMenues = bitesByteDbContext.Menus.Where(x => x.Carbs != null && x.Carbs > 0 && x.Subcategories.ToLower() == "carbs").ToList();
+                return GetMacromenuesByCarbs(carbs, carbsMacroMenues);
+            }
+            catch (Exception) { throw; }
+        }
+
 
         public List<Menu> GetRecommendedMenuByProteinCarbs(decimal? protein, decimal? carbs)
         {

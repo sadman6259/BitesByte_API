@@ -60,6 +60,8 @@ internal class Program
         BitesByte_API.Helper.APIHelper.GetRecommendedMenuByCalorie(app);
         BitesByte_API.Helper.APIHelper.GetRecommendedMenuByProteinCarbs(app);
         BitesByte_API.Helper.APIHelper.GetMenusBySubCategory(app);
+        BitesByte_API.Helper.APIHelper.GetRecommendedMenuByCarbs(app);
+        BitesByte_API.Helper.APIHelper.GetRecommendedMenuByProtein(app);
         BitesByte_API.Helper.APIHelper.UpdateMenus(app);
         app.Run();
     }

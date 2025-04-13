@@ -120,5 +120,31 @@ namespace BitesByte_API.Helper
             #endregion
 
         }
+
+        public static void GetRecommendedMenuByProtein(WebApplication app)
+        {
+            #region getavailablemenus
+            app.MapGet("/getRecommendedMenuByProtein", (IMenuService menuService, decimal? protein) =>
+            {
+                return menuService.GetRecommendedMenuByProtein(protein);
+            })
+            .WithName("GetRecommendedMenuByProtein")
+            .WithOpenApi();
+            #endregion
+
+        }
+
+        public static void GetRecommendedMenuByCarbs(WebApplication app)
+        {
+            #region getavailablemenus
+            app.MapGet("/getRecommendedMenuByCarbs", (IMenuService menuService, decimal? carbs) =>
+            {
+                return menuService.GetRecommendedMenuByCarbs(carbs);
+            })
+            .WithName("GetRecommendedMenuByCarbs")
+            .WithOpenApi();
+            #endregion
+
+        }
     }
 }
