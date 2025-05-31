@@ -72,6 +72,8 @@ namespace OrderService.Service
 
         public async Task<Order> CreateOrderGuest(GuestOrderDTO guestOrder)
         {
+            orderRepository.BeginTran();
+
             try
             {
                 if (guestOrder == null || (guestOrder != null && (guestOrder.Order == null || guestOrder.guestUser == null || guestOrder.OrderDetail.Count < 1))) throw new ArgumentNullException("order");
@@ -92,12 +94,14 @@ namespace OrderService.Service
                 await CreateOrderDetail(guestOrder.OrderDetail, ordernew.OrderReferenceNo);
 
                 orderRepository.SaveChanges();
+                orderRepository.CommitTran();
 
                 return ordernew;
             }
             catch (Exception) {
-                
-                throw ;
+                orderRepository.RollbackTran();
+
+                throw;
             }
             
         }

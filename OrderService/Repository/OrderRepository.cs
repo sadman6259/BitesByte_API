@@ -15,6 +15,10 @@ namespace OrderService.Repository
         void SaveChanges();
         int GetSequenceNo();
         OrderWithDetailDTO GetOrderByRefNo(string orderRef);
+        public void BeginTran();
+        public void CommitTran();
+        public void RollbackTran();
+
     }
     public class OrderRepository : IOrderRepository
     {
@@ -28,6 +32,20 @@ namespace OrderService.Repository
         public void SaveChanges()
         {
             bitesByteDbContext.SaveChanges();
+        }
+
+        public void BeginTran()
+        {
+           bitesByteDbContext.Database.BeginTransactionAsync();
+        }
+
+        public void CommitTran()
+        {
+            bitesByteDbContext.Database.CommitTransactionAsync();
+        }
+        public void RollbackTran()
+        {
+            bitesByteDbContext.Database.RollbackTransaction();
         }
 
         public async Task<GuestUser> CreateGuestUser(GuestUser guestUser) {
