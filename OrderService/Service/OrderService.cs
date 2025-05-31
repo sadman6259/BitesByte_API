@@ -7,7 +7,9 @@ namespace OrderService.Service
     public interface IOrderService
     {
         Task<Order> CreateOrder(OrderDTO order);
-        Task<List<OrderDetail>> CreateOrderDetail(List<OrderDetailDTO> orderDetailDtoLst, string orderRef);
+        Task<Order> CreateOrderGuest(GuestOrderDTO order);
+
+        Task<List<OrderDetail>> CreateOrderDetail(List<OrderDetail> orderDetailDtoLst, string orderRef);
 
         Task<string> GenerateOrderRef();
 
@@ -32,33 +34,28 @@ namespace OrderService.Service
             ordernew.CreatedDate = DateTime.Now;
             ordernew.OrderReferenceNo = await GenerateOrderRef();
 
-            orderRepository.CreateOrder(ordernew);
+            await orderRepository.CreateOrder(ordernew);
 
-            await CreateOrderDetail(order.orderDetailDTOs,ordernew.OrderReferenceNo);
+            //await CreateOrderDetail(order.orderDetailDTOs,ordernew.OrderReferenceNo);
 
 
             return ordernew;
         }
 
-        public async Task<List<OrderDetail>> CreateOrderDetail(List<OrderDetailDTO> orderDetailDtoLst, string orderRef)
+        public async Task<List<OrderDetail>> CreateOrderDetail(List<OrderDetail> orderDetailLst, string orderRef)
         {
 
             List<OrderDetail> newOrderDetailLst = new List<OrderDetail>();
 
-            foreach (var orderDetailDto in orderDetailDtoLst)
+            foreach (var orderDetail in orderDetailLst)
             {
-                OrderDetail newDetail = new OrderDetail();
-                newDetail.TotalPrice = orderDetailDto.TotalPrice;
-                newDetail.Quantity = orderDetailDto.Quantity;
-                newDetail.MenuId = orderDetailDto.menuId;
-                newDetail.CreatedTime = DateTime.Now;
-                newDetail.OrderReferenceNo = orderRef;
-                newDetail.TotalGrams = orderDetailDto.TotalGrams;
-                newOrderDetailLst.Add(newDetail);
+                orderDetail.CreatedTime = DateTime.Now;
+                orderDetail.OrderReferenceNo = orderRef;
+                newOrderDetailLst.Add(orderDetail);
 
             }
             
-            return orderRepository.CreateOrderDetail(newOrderDetailLst);
+            return await orderRepository.CreateOrderDetail(newOrderDetailLst);
         }
 
         public async Task<string> GenerateOrderRef() { 
@@ -71,6 +68,38 @@ namespace OrderService.Service
         public async Task<OrderWithDetailDTO> GetOrderByRefNo(string orderRef)
         {
             return orderRepository.GetOrderByRefNo(orderRef);
+        }
+
+        public async Task<Order> CreateOrderGuest(GuestOrderDTO guestOrder)
+        {
+            try
+            {
+                if (guestOrder == null || (guestOrder != null && (guestOrder.Order == null || guestOrder.guestUser == null || guestOrder.OrderDetail.Count < 1))) throw new ArgumentNullException("order");
+
+                await orderRepository.CreateGuestUser(guestOrder.guestUser);
+                
+                orderRepository.SaveChanges(); // need to remove it later
+
+                Order ordernew = new Order();
+                ordernew = guestOrder.Order;
+                ordernew.CreatedDate = DateTime.Now;
+                ordernew.IsGuestUser = true;
+                ordernew.OrderReferenceNo = await GenerateOrderRef();
+                ordernew.UserId = guestOrder.guestUser.Id;
+
+                await orderRepository.CreateOrder(ordernew);
+
+                await CreateOrderDetail(guestOrder.OrderDetail, ordernew.OrderReferenceNo);
+
+                orderRepository.SaveChanges();
+
+                return ordernew;
+            }
+            catch (Exception) {
+                
+                throw ;
+            }
+            
         }
     }
 }

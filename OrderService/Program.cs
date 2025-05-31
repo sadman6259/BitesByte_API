@@ -46,6 +46,8 @@ app.UseHttpsRedirection();
 
 APIHelper.placeOrder(app);
 APIHelper.getOrderByRefno(app);
+APIHelper.placeOrderGuest(app);
+
 
 app.Run();
 

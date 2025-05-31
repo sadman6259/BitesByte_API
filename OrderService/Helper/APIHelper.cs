@@ -20,6 +20,18 @@ namespace OrderService.Helper
             #endregion
         }
 
+        public static void placeOrderGuest(WebApplication app)
+        {
+            #region placeorder
+            app.MapPost("/placeorderguest", (IOrderService orderService, [FromBody] GuestOrderDTO order) =>
+            {
+                return orderService.CreateOrderGuest(order);
+            })
+            .WithName("PlaceOrderGuest")
+            .WithOpenApi();
+            #endregion
+        }
+
         public static void getOrderByRefno(WebApplication app)
         {
             #region getOrderByRefno

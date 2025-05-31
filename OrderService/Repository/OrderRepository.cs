@@ -8,9 +8,11 @@ namespace OrderService.Repository
 {
     public interface IOrderRepository
     {
-        Order CreateOrder(Order order);
-        List<OrderDetail> CreateOrderDetail(List<OrderDetail> orderDetailLst);
+        Task<Order> CreateOrder(Order order);
+        Task<GuestUser> CreateGuestUser(GuestUser guestUser);
 
+        Task<List<OrderDetail>> CreateOrderDetail(List<OrderDetail> orderDetailLst);
+        void SaveChanges();
         int GetSequenceNo();
         OrderWithDetailDTO GetOrderByRefNo(string orderRef);
     }
@@ -22,24 +24,35 @@ namespace OrderService.Repository
         {
             bitesByteDbContext = _bitesByteDbContext;
         }
-        public Order CreateOrder(Order order) {
-            bitesByteDbContext.Orders.Add(order);
+
+        public void SaveChanges()
+        {
             bitesByteDbContext.SaveChanges();
+        }
+
+        public async Task<GuestUser> CreateGuestUser(GuestUser guestUser) {
+            await bitesByteDbContext.GuestUsers.AddAsync(guestUser);
+            return guestUser;
+        }
+        public async Task<Order> CreateOrder(Order order)
+        {
+            await bitesByteDbContext.Orders.AddAsync(order);
+            //bitesByteDbContext.SaveChanges();
             return order;
         }
-        public List<OrderDetail> CreateOrderDetail(List<OrderDetail> orderDetailLst)
+        public async Task< List<OrderDetail>> CreateOrderDetail(List<OrderDetail> orderDetailLst)
         {
 
-            bitesByteDbContext.OrderDetails.AddRange(orderDetailLst);
-            bitesByteDbContext.SaveChanges();
+            await bitesByteDbContext.OrderDetails.AddRangeAsync(orderDetailLst);
+            //bitesByteDbContext.SaveChanges();
             return orderDetailLst;
         }
         public OrderWithDetailDTO GetOrderByRefNo(string orderRef)
         {
-            var query = bitesByteDbContext.Orders   
-           .Join(bitesByteDbContext.OrderDetails, 
-              order => order.OrderReferenceNo,        
-              ordDetail => ordDetail.OrderReferenceNo,   
+            var query = bitesByteDbContext.Orders
+           .Join(bitesByteDbContext.OrderDetails,
+              order => order.OrderReferenceNo,
+              ordDetail => ordDetail.OrderReferenceNo,
               (order, ordDetail) => new { order = order, ordDetail = ordDetail })
            .Join(bitesByteDbContext.Users,
               ord => ord.order.UserId,
@@ -54,6 +67,8 @@ namespace OrderService.Repository
 
             OrderWithDetailDTO orderWithDetailDTO = new OrderWithDetailDTO();
             List<OrderChild> orderChildren = new List<OrderChild>();
+
+
 
             orderWithDetailDTO.OrderReferenceNo = query.FirstOrDefault().ord.ord.order.OrderReferenceNo;
             orderWithDetailDTO.TotalPrice = query.FirstOrDefault().ord.ord.order.TotalPrice;
@@ -74,6 +89,8 @@ namespace OrderService.Repository
             orderWithDetailDTO.orderChildren = orderChildren;
 
             return orderWithDetailDTO;
+
+
         }
         public int GetSequenceNo()
         {

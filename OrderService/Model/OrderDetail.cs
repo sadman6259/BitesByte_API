@@ -11,11 +11,11 @@ public partial class OrderDetail
 
     public int Quantity { get; set; }
 
-    public string OrderReferenceNo { get; set; } = null!;
+    public string? OrderReferenceNo { get; set; }
 
     public decimal? TotalPrice { get; set; }
 
     public DateTime? CreatedTime { get; set; }
-    public decimal? TotalGrams { get; set; }
 
+    public decimal? TotalGrams { get; set; }
 }
